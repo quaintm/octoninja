@@ -1,4 +1,4 @@
-# first views
+# views -- defines each page route for the app
 
 from flask import render_template, flash, redirect
 from app import app
