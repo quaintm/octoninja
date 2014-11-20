@@ -15,7 +15,7 @@ class User(db.Model):
 class Case(db.Model):
   id = db.Column(db.Integer, primary_key = True)
   examinee = db.Column(db.String(140))
-  start_date = db.Column(db.Datetime)
+  start_date = db.Column(db.DateTime)
   primary_user = db.Column(db.Integer,db.ForeignKey('user.id'))
 
   def __repr__(self):
