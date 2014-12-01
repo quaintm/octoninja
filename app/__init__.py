@@ -1,5 +1,7 @@
-from flask import Flask
+from flask import Flask, render_template
 from flask.ext.sqlalchemy import SQLAlchemy
+from flask.ext.security import Security, SQLAlchemyUserDatastore, \
+  UserMixin, RoleMixin, login_required
 import os
 from flask.ext.login import LoginManager
 from flask.ext.openid import OpenID
