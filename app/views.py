@@ -28,7 +28,7 @@ user_datastore = SQLAlchemyUserDatastore(db, User, Role)
 security = Security(app, user_datastore)
 
 
-
+# pre-load actions
 @lm.user_loader
 def load_user(id):
   return User.query.get(int(id))
@@ -36,9 +36,12 @@ def load_user(id):
 @app.before_first_request
 def create_user():
     db.create_all()
-    user_datastore.create_user(
-      email='quaintm@email.net', 
-      password_hash=encrypt_password('password'))
+    user = User.query.first()
+    if user is None:
+      user_datastore.create_user(
+        nickname='Monica',
+        email='quaintm@email.net', 
+        password=encrypt_password('password'))
     db.session.commit()
 
 @app.before_request
@@ -46,6 +49,7 @@ def before_request():
   g.user = current_user
 
 
+#routes
 @app.route('/')
 @app.route('/index')
 @login_required
@@ -54,41 +58,23 @@ def index():
   return render_template('index.html',
     title='Home', user=user)
 
-
 @app.route('/login', methods=['GET','POST'])
-@oid.loginhandler
 def login():
   if g.user is not None and g.user.is_authenticated():
     return redirect(url_for('index'))
-  form = LoginForm()
-  if form.validate_on_submit():
-    session['remember_me'] = form.remember_me.data
+  form = LoginForm(request.form)
+  if request.method == 'POST':
+    if form.validate_on_submit():
+      login_user(form.email)
+      flash("Login Successful")
+      session['remember_me'] = form.remember_me.data
+      redirect_url = request.args.get("next") or url_for("index")
+      return redirect(redirect_url)
 
-    return oid.try_login(form.userid.data, ask_for=['nickname','email'])
+    else:
+      flash_errors(form)
   return render_template('login.html',
-    title = 'Sign In', form=form,
-    providers = app.config['OPENID_PROVIDERS'])
-
-
-@oid.after_login
-def after_login(resp):
-  if resp.email is None or resp.email == "":
-    flash('Invalid login.')
-    return redirect(url_for('login'))
-  user = User.query.filter_by(email=resp.email).first()
-  if user is None:
-    nickname = resp.nickname
-    if nickname is None or nickname == "":
-      nickname = resp.email.split('@')[0]
-    user = User(nickname = nickname, email = resp.email)
-    db.session.add(user)
-    db.session.commit()
-  remember_me = False
-  if 'remember_me' in session:
-    remember_me = session['remember_me']
-    session.pop('remember_me',None)
-  login_user(user, remember = remember_me)
-  return redirect(request.args.get('next') or url_for('index'))
+    title = 'Sign In', form=form)
 
 @app.route('/logout')
 def logout():
