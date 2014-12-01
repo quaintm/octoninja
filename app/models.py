@@ -18,7 +18,7 @@ class User(db.Model,UserMixin):
   id = db.Column(db.Integer, primary_key=True)
   nickname = db.Column(db.String(64), index=True, unique=True)
   email = db.Column(db.String(255), unique=True)
-  password_hash = db.Column(db.String(255))
+  password = db.Column(db.String(255))
   active = db.Column(db.Boolean())
   confirmed_at = db.Column(db.DateTime())
   cases = db.relationship('Case', backref='case_lead', lazy='dynamic')
@@ -38,10 +38,10 @@ class User(db.Model,UserMixin):
 
 # for use with passlib
   def hash_password(self, pwd):
-    self.password_hash = pwd_context.encrypt(pwd)
+    self.password = pwd_context.encrypt(pwd)
 
   def verify_password(self, pwd):
-    return pwd_context.verify(pwd, self.password_hash)
+    return pwd_context.verify(pwd, self.password)
 
 
   def get_id(self):
