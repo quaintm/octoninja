@@ -1,6 +1,14 @@
 # creates classes for db
 from app import db
 from passlib.apps import custom_app_context as pwd_context
+from flask.ext.security import (
+  Security, 
+  SQLAlchemyUserDatastore,
+  UserMixin, 
+  RoleMixin, 
+  login_required)
+
+
 
 roles_users = db.Table('roles_users',
         db.Column('user_id', db.Integer(), db.ForeignKey('user.id')),
@@ -18,6 +26,7 @@ class User(db.Model,UserMixin):
   roles = db.relationship('Role', secondary=roles_users,
                            backref=db.backref('users', lazy='dynamic'))
 
+
   def is_authenticated(self):
     return True
 
@@ -28,11 +37,11 @@ class User(db.Model,UserMixin):
     return False
 
 # for use with passlib
-  def hash_password(self, password):
-    self.password_hash = pwd_context.encrypt(password)
+  def hash_password(self, pwd):
+    self.password_hash = pwd_context.encrypt(pwd)
 
-  def verify_password(self, password):
-    return pwd_context.verify(password, self.password_hash)
+  def verify_password(self, pwd):
+    return pwd_context.verify(pwd, self.password_hash)
 
 
   def get_id(self):
