@@ -1,5 +1,6 @@
 # creates classes for db
 from app import db
+from passlib.apps import custom_app_context as pwd_context
 
 roles_users = db.Table('roles_users',
         db.Column('user_id', db.Integer(), db.ForeignKey('user.id')),
@@ -9,7 +10,7 @@ class User(db.Model,UserMixin):
   id = db.Column(db.Integer, primary_key=True)
   nickname = db.Column(db.String(64), index=True, unique=True)
   email = db.Column(db.String(255), unique=True)
-  password = db.Column(db.String(255))
+  password_hash = db.Column(db.String(255))
   active = db.Column(db.Boolean())
   confirmed_at = db.Column(db.DateTime())
   cases = db.relationship('Case', backref='case_lead', lazy='dynamic')
@@ -25,6 +26,14 @@ class User(db.Model,UserMixin):
 
   def is_anonymous(self):
     return False
+
+# for use with passlib
+  def hash_password(self, password):
+    self.password_hash = pwd_context.encrypt(password)
+
+  def verify_password(self, password):
+    return pwd_context.verify(password, self.password_hash)
+
 
   def get_id(self):
     try:
