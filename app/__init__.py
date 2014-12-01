@@ -11,6 +11,7 @@ from config import basedir
 app = Flask(__name__)
 app.config.from_object('config')
 
+
 db = SQLAlchemy(app)
 lm = LoginManager()
 lm.init_app(app)
