@@ -38,7 +38,7 @@ def create_user():
     db.create_all()
     user_datastore.create_user(
       email='quaintm@email.net', 
-      password=encrypt_password('password'))
+      password_hash=encrypt_password('password'))
     db.session.commit()
 
 @app.before_request
