@@ -6,7 +6,8 @@ from flask import (
   redirect, 
   session, 
   url_for,
-  request, g
+  request, 
+  g)
 from flask.ext.login import (
   login_user, 
   logout_user, 
@@ -23,6 +24,9 @@ from app import app, db, lm, oid
 from forms import LoginForm
 from models import User, Role
 
+user_datastore = SQLAlchemyUserDatastore(db, User, Role)
+security = Security(app, user_datastore)
+
 
 
 @lm.user_loader
@@ -32,12 +36,15 @@ def load_user(id):
 @app.before_first_request
 def create_user():
     db.create_all()
-    user_datastore.create_user(email='quaintm@email.net', password='password')
+    user_datastore.create_user(
+      email='quaintm@email.net', 
+      password=encrypt_password('password'))
     db.session.commit()
 
 @app.before_request
 def before_request():
   g.user = current_user
+
 
 @app.route('/')
 @app.route('/index')
