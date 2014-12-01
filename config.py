@@ -10,8 +10,8 @@ SECURITY_PASSWORD_HASH = 'bcrypt'
 SECURITY_PASSWORD_SALT = SECRET_KEY
 DEBUG = True
 
-SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(basedir, 'app.db')
-SQLALCHEMY_MIGRATE_REPO = os.path.join(basedir, 'db_repository')
+SQLALCHEMY_DATABASE_URI = 'sqlite:///app.db'
+# SQLALCHEMY_MIGRATE_REPO = os.path.join(basedir, 'db_repository')
 
 # openid section below:
 
