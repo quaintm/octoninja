@@ -1,11 +1,24 @@
 # views -- defines each page route for the app
 
-from flask import render_template, flash, redirect, session, url_for, \
+from flask import (
+  render_template, 
+  flash, 
+  redirect, 
+  session, 
+  url_for,
   request, g
-from flask.ext.login import login_user, logout_user, current_user, \
-  login_required
-from flask.ext.security import Security, SQLAlchemyUserDatastore, \
-    UserMixin, RoleMixin, login_required
+from flask.ext.login import (
+  login_user, 
+  logout_user, 
+  current_user, 
+  login_required)
+from flask.ext.security import (
+  Security, 
+  SQLAlchemyUserDatastore,
+  UserMixin, 
+  RoleMixin, 
+  login_required)
+from flask.ext.security.utils import encrypt_password
 from app import app, db, lm, oid
 from forms import LoginForm
 from models import User, Role
@@ -43,6 +56,7 @@ def login():
   form = LoginForm()
   if form.validate_on_submit():
     session['remember_me'] = form.remember_me.data
+
     return oid.try_login(form.userid.data, ask_for=['nickname','email'])
   return render_template('login.html',
     title = 'Sign In', form=form,
